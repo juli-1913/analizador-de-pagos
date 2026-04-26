@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de pagos</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="container">
+
+    <h1>💸 Panel de pagos</h1>
+
+    <div id="sesionInfo" class="sesion-banner" style="display:none;">
+      <strong id="usuarioLogueado"></strong>
+      <button class="logout-btn" onclick="logout()">Cerrar sesión</button>
+    </div>
+
+    <!-- AUTH -->
+    <div class="card" id="authCard">
+      <h2>Autenticación</h2>
+
+      <h3>Registrarse</h3>
+
+      <div class="auth-field">
+        <input type="text" id="registroNombre" placeholder="Nombre">
+        <small id="errorRegistroNombre" class="field-error"></small>
+      </div>
+
+      <div class="auth-field">
+        <input type="email" id="registroEmail" placeholder="Email">
+        <small id="errorRegistroEmail" class="field-error"></small>
+      </div>
+
+      <div class="auth-field">
+        <input type="password" id="registroPassword" placeholder="Contraseña">
+        <small id="errorRegistroPassword" class="field-error"></small>
+      </div>
+
+      <div class="auth-field">
+        <input type="text" id="registroNombreComercio" placeholder="Nombre del comercio">
+        <small id="errorRegistroNombreComercio" class="field-error"></small>
+      </div>
+
+      <div class="form-group">
+        <button 
+          id="btnRegistro"
+          class="auth-action-btn"
+          onclick="registrarse()">
+          Registrarse
+        </button>
+      </div>
+
+      <div id="registroResultado"></div>
+
+      <hr>
+
+      <h3>Iniciar sesión</h3>
+
+      <div class="auth-field">
+        <input type="email" id="loginEmail" placeholder="Email">
+        <small id="errorLoginEmail" class="field-error"></small>
+      </div>
+
+      <div class="auth-field">
+        <input type="password" id="loginPassword" placeholder="Contraseña">
+        <small id="errorLoginPassword" class="field-error"></small>
+      </div>
+
+      <div class="form-group">
+        <button id="btnLogin" class="auth-action-btn" onclick="login()">Iniciar sesión</button>
+      </div>
+
+      <div id="authResultado"></div>
+    </div>
+
+    <!-- CONTENIDO DE LA APP -->
+    <div id="appContent" style="display:none;">
+
+      <!-- CREAR PAGO -->
+      <div class="card crear-pago-card">
+        <h2>Crear Pago</h2>
+
+        <div class="crear-pago-form">
+          <label for="monto">Monto ($):</label>
+          <input type="number" id="monto" placeholder="Ej: 5000">
+
+          <label for="fecha">Fecha:</label>
+          <input type="date" id="fecha">
+
+          <label for="estado">Estado:</label>
+          <select id="estado">
+            <option value="pendiente">Pendiente</option>
+            <option value="pagado">Pagado</option>
+            <option value="rechazado">Rechazado</option>
+            <option value="cancelado">Cancelado</option>
+          </select>
+        </div>
+
+        <button class="primary" onclick="crearPago()">Crear pago</button>
+
+        <div id="resultado"></div>
+      </div>
+
+      <!-- LISTAR PAGOS -->
+      <div class="card">
+        <div class="header-flex">
+          <h2>Pagos</h2>
+          <div>
+            <button onclick="listarPagos()">🔄 Recargar</button>
+            <button onclick="descargarCSV()">⬇️ Excel</button>
+          </div>
+        </div>
+
+        <!-- FILTROS -->
+        <div class="form-group">
+          <input type="date" id="fechaDesde">
+          <input type="date" id="fechaHasta">
+          <button onclick="listarPagos()">Filtrar</button>
+          <button onclick="limpiarFiltros()">Limpiar</button>
+        </div>
+
+        <!-- MÉTRICAS -->
+        <div class="metrics">
+          <div class="metric">
+            <h3>Total vendido</h3>
+            <p id="total">$0</p>
+          </div>
+
+          <div class="metric">
+            <h3>Pagos</h3>
+            <p id="cantidad">0</p>
+          </div>
+
+          <div class="metric">
+            <h3>Pagados</h3>
+            <p id="pagados">0</p>
+          </div>
+
+          <div class="metric">
+            <h3>Pendientes</h3>
+            <p id="pendientes">0</p>
+          </div>
+
+          <div class="metric">
+            <h3>Ticket promedio</h3>
+            <p id="ticketPromedio">$0</p>
+          </div>
+
+          <div class="metric">
+            <h3>Mejor día</h3>
+            <p id="mejorDia">-</p>
+          </div>
+
+          <div class="metric">
+            <h3>Peor día</h3>
+            <p id="peorDia">-</p>
+          </div>
+
+          <div class="metric">
+            <h3>Alerta</h3>
+            <p id="alertaVentas">-</p>
+          </div>
+
+          <div class="metric">
+            <h3>Mejor día semana</h3>
+            <p id="mejorDiaSemana">-</p>
+          </div>
+
+          <div class="metric">
+            <h3>Peor día semana</h3>
+            <p id="peorDiaSemana">-</p>
+          </div>
+
+          <div class="metric">
+            <h3>Mes actual</h3>
+            <p id="mesActual">$0</p>
+          </div>
+
+          <div class="metric">
+            <h3>Mes anterior</h3>
+            <p id="mesAnterior">$0</p>
+          </div>
+
+          <div class="metric">
+            <h3>Comparación mensual</h3>
+            <p id="comparacionMensual">-</p>
+          </div>
+        </div>
+
+        <!-- GRÁFICO -->
+        <div class="chart-container">
+          <canvas id="graficoVentas"></canvas>
+        </div>
+
+        <!-- TABLA -->
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Monto</th>
+              <th>Estado</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody id="tablaPagos"></tbody>
+        </table>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
